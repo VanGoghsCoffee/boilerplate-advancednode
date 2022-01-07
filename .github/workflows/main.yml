@@ -21,4 +21,4 @@ jobs:
         run: npm ci
         
       - name: Restart server application
-        run: pm2 restart VGC-Chat
+        run: MONGO_URI=${{secrets.MONGO_URI}} pm2 restart VGC-Chat
