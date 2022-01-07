@@ -26,18 +26,29 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser((user, done) => {
-  done(null, user._id);
-});
 
-passport.deserializeUser((id, done) => {
-  myDatabase.findOne({ _id: new ObjectID(id) }, (err, doc) => {
-    done(null, null);
+myDB(async client => {
+
+  const myDataBase = await client.db('database').collection('users');
+
+  app.route('/').get((req, res) => {
+    res.render('pug/index', { title: 'Connected to Database', message: 'Please login' });
   });
-});
 
-app.route('/').get((req, res) => {
-  res.render('pug/index', { title: 'Hello', message: 'Please login' });
+  passport.serializeUser((user, done) => {
+    done(null, user._id);
+  });
+  
+  passport.deserializeUser((id, done) => {
+    myDatabase.findOne({ _id: new ObjectID(id) }, (err, doc) => {
+      done(null, doc);
+    });
+  });
+
+}).catch(e => {
+  app.route('/').get((req, res) => {
+    res.render('pug/index', { title: e, message: 'Unable to login' });
+  });
 });
 
 const PORT = process.env.PORT || 3002;
