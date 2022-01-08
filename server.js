@@ -51,7 +51,7 @@ myDB(async client => {
 
   app.route('/profile')
     .get(ensureAuthenticated, (req, res) => {
-      res.render('pug/profile');
+      res.render('pug/profile', { username: req.user.username });
     });
 
   app.route('/login')
