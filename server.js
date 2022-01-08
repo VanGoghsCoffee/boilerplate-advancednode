@@ -34,19 +34,41 @@ myDB(async client => {
 
   const myDataBase = await client.db('database').collection('users');
 
+  function registerUser(req, res, next) {
+
+    myDataBase.findOne({ username: req.body.username }, (err, user) => {
+      if (err) {
+        next(err);
+      } else if (user) {
+        res.redirect('/');
+      } else {
+        myDataBase.insertOne({
+          username: req.body.username,
+          password: req.body.password
+        }, (err, doc) => {
+          if (err) {
+            res.redirect('/');
+          } else {
+            next(null, doc.ops[0]);
+          }
+        })
+      }
+    })
+  }
+
   passport.serializeUser((user, done) => {
     done(null, user._id);
   });
   
   passport.deserializeUser((id, done) => {
-    myDatabase.findOne({ _id: new ObjectID(id) }, (err, doc) => {
+    myDataBase.findOne({ _id: new ObjectID(id) }, (err, doc) => {
       done(null, doc);
     });
   });
 
   app.route('/')
     .get((req, res) => {
-        res.render('pug/index', { title: 'Connected to Database', message: 'Please login', showLogin: true });
+        res.render('pug/index', { title: 'Connected to Database', message: 'Please login', showLogin: true, showRegistration: true });
     });
 
   app.route('/profile')
@@ -56,6 +78,11 @@ myDB(async client => {
 
   app.route('/login')
     .post(passport.authenticate('local', { failureRedirect: '/'} ), (req, res) => {
+      res.redirect('/profile');
+    });
+
+  app.route('/register')
+    .post(registerUser, passport.authenticate('local', { failureRedirect: '/' }), (req, res, next) => {
       res.redirect('/profile');
     });
 
