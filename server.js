@@ -34,28 +34,6 @@ myDB(async client => {
 
   const myDataBase = await client.db('database').collection('users');
 
-  function registerUser(req, res, next) {
-
-    myDataBase.findOne({ username: req.body.username }, (err, user) => {
-      if (err) {
-        next(err);
-      } else if (user) {
-        res.redirect('/');
-      } else {
-        myDataBase.insertOne({
-          username: req.body.username,
-          password: req.body.password
-        }, (err, doc) => {
-          if (err) {
-            res.redirect('/');
-          } else {
-            next(null, doc.ops[0]);
-          }
-        })
-      }
-    })
-  }
-
   passport.serializeUser((user, done) => {
     done(null, user._id);
   });
@@ -82,7 +60,26 @@ myDB(async client => {
     });
 
   app.route('/register')
-    .post(registerUser, passport.authenticate('local', { failureRedirect: '/' }), (req, res, next) => {
+    .post((req, res, next) => {
+      myDataBase.findOne({ username: req.body.username }, (err, user) => {
+        if (err) {
+          next(err);
+        } else if (user) {
+          res.redirect('/');
+        } else {
+          myDataBase.insertOne({
+            username: req.body.username,
+            password: req.body.password
+          }, (err, doc) => {
+            if (err) {
+              res.redirect('/');
+            } else {
+              next(null, doc.ops[0]);
+            }
+          })
+        }
+      });
+    }, passport.authenticate('local', { failureRedirect: '/' }), (req, res, next) => {
       res.redirect('/profile');
     });
 
