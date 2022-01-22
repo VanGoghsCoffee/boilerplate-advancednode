@@ -9,13 +9,11 @@ module.exports = function(app, myDataBase) {
         });
     app.route('/profile')
         .get(ensureAuthenticated, (req, res) => {
-            console.log('req.user', req.user);
             res.render('pug/profile', { username: req.user.name });
         });
 
     app.route('/chat')
         .get(ensureAuthenticated, (req, res) => {
-            console.log('req.user', req.user);
             res.render('pug/chat', { user: req.user })
         });
 
