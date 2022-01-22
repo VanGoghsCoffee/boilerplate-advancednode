@@ -22,7 +22,7 @@ io.use(
   passportSocketIo.authorize({
     cookieParser: cookieParser,
     key: 'express.sid',
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || HOLA,
     store: store,
     success: onAuthorizeSuccess,
     fail: onAuthorizeFail
@@ -54,7 +54,7 @@ myDB(async client => {
   let currentUsers = 0;
   io.on('connection', socket => {
     ++currentUsers;
-    console.log('user ' + socket.request.user.username + ' connected');
+    console.log('user ' + socket.request.user.name + ' connected');
     io.emit('user count', currentUsers);
 
     socket.on('disconnect', () => {
