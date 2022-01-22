@@ -54,7 +54,7 @@ myDB(async client => {
   let currentUsers = 0;
   io.on('connection', socket => {
     ++currentUsers;
-    console.log('user ' + socket.request.user.name + ' connected');
+    console.log('user ' + socket.request.user.username + ' connected');
     io.emit('user count', currentUsers);
 
     socket.on('disconnect', () => {
