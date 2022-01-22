@@ -9,7 +9,6 @@ const session = require('express-session');
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 
 const app = express();
-
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
